@@ -1,0 +1,5 @@
+C:\Users\ali93\Documents\Visual Studio 2013\Projects\AltoControls\AltoControls\bin\Debug\AltoControls.dll
+C:\Users\ali93\Documents\Visual Studio 2013\Projects\AltoControls\AltoControls\bin\Debug\AltoControls.pdb
+C:\Users\ali93\Documents\Visual Studio 2013\Projects\AltoControls\AltoControls\obj\Debug\AltoControls.csprojResolveAssemblyReference.cache
+C:\Users\ali93\Documents\Visual Studio 2013\Projects\AltoControls\AltoControls\obj\Debug\AltoControls.dll
+C:\Users\ali93\Documents\Visual Studio 2013\Projects\AltoControls\AltoControls\obj\Debug\AltoControls.pdb
