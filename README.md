@@ -14,3 +14,5 @@ Custom NumericUpDown control
 Customizable Classic ProgressBar
 
 Waiter control for long tasks
+
+<img src="http://i.imgur.com/w0zoRot.png"></img>
