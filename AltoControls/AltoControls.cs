@@ -1600,5 +1600,154 @@ namespace AltoControls
         }
     }
     #endregion
-        
+
+    #region SlideButton
+    public class SlideButton : Control
+    {
+        public delegate void SliderChangedEventHandler(object sender, EventArgs e);
+        public event SliderChangedEventHandler SliderValueChanged;
+
+        #region Variables
+        RoundedRectangleF rect;
+        RectangleF circle;
+        private bool isOn;
+        float artis;
+        private Color colorOn;
+        private Color colorOff;
+        private Color borderColor;
+        System.Windows.Forms.Timer paintTicker = new System.Windows.Forms.Timer();
+        #endregion
+        #region Properties
+        public bool IsOn
+        {
+            get { return isOn; }
+            set
+            {
+                isOn = value;
+                paintTicker.Start();
+                if (SliderValueChanged != null)
+                    SliderValueChanged(this, EventArgs.Empty);
+            }
+        }
+        public Color BorderColor
+        {
+            get { return borderColor; }
+            set
+            {
+                borderColor = value;
+                Invalidate();
+            }
+        }
+
+        public Color ColorOff
+        {
+            get { return colorOff; }
+            set
+            {
+                colorOff = value;
+                if (!isOn)
+                    Invalidate();
+            }
+        }
+
+        public Color ColorOn
+        {
+            get { return colorOn; }
+            set
+            {
+                colorOn = value;
+                if (isOn)
+                    Invalidate();
+
+            }
+        }
+        #endregion
+
+        public SlideButton()
+        {
+            artis = 4; //increment for sliding animation
+            Cursor = Cursors.Hand;
+            DoubleBuffered = true;
+
+            rect = new RoundedRectangleF(60, 32, 15, 1, 1);
+            circle = new RectangleF(1, 1, 30, 30);
+            isOn = true;
+            borderColor = Color.LightGray;
+            colorOn = Color.LightGreen;
+            colorOff = Color.FromArgb(250, 95, 95);
+
+            paintTicker.Tick += paintTicker_Tick;
+            paintTicker.Interval = 1;
+        }
+
+        //creates slide animation
+        void paintTicker_Tick(object sender, EventArgs e)
+        {
+            float x = circle.X;
+
+            if (isOn)           //switch the circle to the left
+            {
+                if (x - artis >= 1)
+                {
+                    x -= artis;
+                    circle = new RectangleF(x, 1, 30, 30);
+                    Invalidate();
+                }
+                else
+                {
+                    x = 1;
+                    circle = new RectangleF(x, 1, 30, 30);
+                    Invalidate();
+                    paintTicker.Stop();
+
+                }
+            }
+            else //switch the circle to the left with animation
+            {
+
+                if (x + artis <= Width - 31)
+                {
+                    x += artis;
+                    circle = new RectangleF(x, 1, 30, 30);
+                    Invalidate();
+                }
+                else
+                {
+                    x = Width - 31;
+                    circle = new RectangleF(x, 1, 30, 30);
+                    Invalidate();
+                    paintTicker.Stop();
+                }
+            }
+        }
+
+        protected override Size DefaultSize
+        {
+            get
+            {
+                return new Size(60, 35);
+            }
+        }
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            e.Graphics.SmoothingMode = SmoothingMode.HighQuality;
+
+            using (Pen pen = new Pen(borderColor, 2f))
+                e.Graphics.DrawPath(pen, rect.Path);
+
+            using (SolidBrush circleBrush = new SolidBrush(isOn ? colorOn : colorOff))
+                e.Graphics.FillEllipse(circleBrush, circle);
+
+        }
+        protected override void OnMouseClick(MouseEventArgs e)
+        {
+            if (e.Button != System.Windows.Forms.MouseButtons.Left)
+                return;
+            isOn = !isOn;
+            IsOn = isOn;
+
+            base.OnMouseClick(e);
+        }
+    }
+    #endregion
 }
