@@ -15,4 +15,10 @@ Customizable Classic ProgressBar
 
 Waiter control for long tasks
 
+**UPDATE:** New Switch Slider Control (SliderControl) has been added
+
+<img src="http://i.imgur.com/OSxnJFS.png"></img>
+
+**Preview for controls**
+
 <img src="http://i.imgur.com/JSaiTgz.png"></img>
