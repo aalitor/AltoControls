@@ -1608,6 +1608,7 @@ namespace AltoControls
         public event SliderChangedEventHandler SliderValueChanged;
 
         #region Variables
+        float diameter;
         RoundedRectangleF rect;
         RectangleF circle;
         private bool isOn;
@@ -1615,9 +1616,20 @@ namespace AltoControls
         private Color colorOn;
         private Color colorOff;
         private Color borderColor;
+        private bool textEnabled;
         System.Windows.Forms.Timer paintTicker = new System.Windows.Forms.Timer();
         #endregion
+
         #region Properties
+        public bool TextEnabled
+        {
+            get { return textEnabled; }
+            set
+            {
+                textEnabled = value;
+                Invalidate();
+            }
+        }
         public bool IsOn
         {
             get { return isOn; }
@@ -1665,12 +1677,15 @@ namespace AltoControls
 
         public SlideButton()
         {
-            artis = 4; //increment for sliding animation
+
             Cursor = Cursors.Hand;
             DoubleBuffered = true;
 
-            rect = new RoundedRectangleF(60, 32, 15, 1, 1);
-            circle = new RectangleF(1, 1, 30, 30);
+            artis = 4; //increment for sliding animation
+            diameter = 30;
+            textEnabled = true;
+            rect = new RoundedRectangleF(2 * diameter, diameter + 2, diameter / 2, 1, 1);
+            circle = new RectangleF(1, 1, diameter, diameter);
             isOn = true;
             borderColor = Color.LightGray;
             colorOn = Color.LightGreen;
@@ -1679,7 +1694,33 @@ namespace AltoControls
             paintTicker.Tick += paintTicker_Tick;
             paintTicker.Interval = 1;
         }
+        Color temp1, temp2;
 
+        protected override void OnEnabledChanged(EventArgs e)
+        {
+            if (!Enabled)
+            {
+                temp1 = colorOn;
+                temp2 = colorOff;
+                colorOff = colorOn = Color.LightGray;
+            }
+            else
+            {
+                colorOn = temp1;
+                colorOff = temp2;
+            }
+            Invalidate();
+            base.OnEnabledChanged(e);
+        }
+        protected override void OnResize(EventArgs e)
+        {
+            Width = (Height - 2) * 2;
+            diameter = Width / 2;
+            artis = 4 * diameter / 30;
+            rect = new RoundedRectangleF(2 * diameter, diameter + 2, diameter / 2, 1, 1);
+            circle = new RectangleF(isOn ? 1 : Width - diameter - 1, 1, diameter, diameter);
+            base.OnResize(e);
+        }
         //creates slide animation
         void paintTicker_Tick(object sender, EventArgs e)
         {
@@ -1690,13 +1731,15 @@ namespace AltoControls
                 if (x - artis >= 1)
                 {
                     x -= artis;
-                    circle = new RectangleF(x, 1, 30, 30);
+                    circle = new RectangleF(x, 1, diameter, diameter);
+
                     Invalidate();
                 }
                 else
                 {
                     x = 1;
-                    circle = new RectangleF(x, 1, 30, 30);
+                    circle = new RectangleF(x, 1, diameter, diameter);
+
                     Invalidate();
                     paintTicker.Stop();
 
@@ -1705,16 +1748,18 @@ namespace AltoControls
             else //switch the circle to the left with animation
             {
 
-                if (x + artis <= Width - 31)
+                if (x + artis <= Width - diameter - 1)
                 {
                     x += artis;
-                    circle = new RectangleF(x, 1, 30, 30);
+                    circle = new RectangleF(x, 1, diameter, diameter);
+
                     Invalidate();
                 }
                 else
                 {
-                    x = Width - 31;
-                    circle = new RectangleF(x, 1, 30, 30);
+                    x = Width - diameter - 1;
+                    circle = new RectangleF(x, 1, diameter, diameter);
+
                     Invalidate();
                     paintTicker.Stop();
                 }
@@ -1733,10 +1778,29 @@ namespace AltoControls
             e.Graphics.SmoothingMode = SmoothingMode.HighQuality;
 
             using (Pen pen = new Pen(borderColor, 2f))
+            {
                 e.Graphics.DrawPath(pen, rect.Path);
+            }
+
+            string on = "ON";
+            string off = "OFF";
+            if (textEnabled)
+                using (Font font = new Font("Arial", 9 * diameter / 30, FontStyle.Bold))
+                {
+                    int height = TextRenderer.MeasureText(off, font).Height;
+                    float y = (diameter - height) / 2f;
+                    e.Graphics.DrawString(off, font, Brushes.Gray, 3, y + 1);
+
+                    height = TextRenderer.MeasureText(on, font).Height;
+                    y = (diameter - height) / 2f;
+                    e.Graphics.DrawString(on, font, Brushes.Gray, diameter + 2, y + 1);
+                }
+
 
             using (SolidBrush circleBrush = new SolidBrush(isOn ? colorOn : colorOff))
                 e.Graphics.FillEllipse(circleBrush, circle);
+
+            base.OnPaint(e);
 
         }
         protected override void OnMouseClick(MouseEventArgs e)
