@@ -15,7 +15,7 @@ Customizable Classic ProgressBar
 
 Waiter control for long tasks
 
-**UPDATE:** New Switch Slider Control (SliderControl) added
+**UPDATE:** New AnimatedSwitch Control (SliderControl) added
 
 **Preview for controls**
 
