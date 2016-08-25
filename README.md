@@ -19,4 +19,4 @@ Waiter control for long tasks
 
 **Preview for controls**
 
-<img src="http://i.imgur.com/9Qsvp7r.png"></img>
+<img src="http://i.imgur.com/LVgoQa2.png"></img>
