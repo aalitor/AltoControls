@@ -1613,8 +1613,6 @@ namespace AltoControls
         RectangleF circle;
         private bool isOn;
         float artis;
-        private Color colorOn;
-        private Color colorOff;
         private Color borderColor;
         private bool textEnabled;
         System.Windows.Forms.Timer paintTicker = new System.Windows.Forms.Timer();
@@ -1635,6 +1633,7 @@ namespace AltoControls
             get { return isOn; }
             set
             {
+                paintTicker.Stop();
                 isOn = value;
                 paintTicker.Start();
                 if (SliderValueChanged != null)
@@ -1651,28 +1650,6 @@ namespace AltoControls
             }
         }
 
-        public Color ColorOff
-        {
-            get { return colorOff; }
-            set
-            {
-                colorOff = value;
-                if (!isOn)
-                    Invalidate();
-            }
-        }
-
-        public Color ColorOn
-        {
-            get { return colorOn; }
-            set
-            {
-                colorOn = value;
-                if (isOn)
-                    Invalidate();
-
-            }
-        }
         #endregion
 
         public SlideButton()
@@ -1688,27 +1665,13 @@ namespace AltoControls
             circle = new RectangleF(1, 1, diameter, diameter);
             isOn = true;
             borderColor = Color.LightGray;
-            colorOn = Color.LightGreen;
-            colorOff = Color.FromArgb(250, 95, 95);
 
             paintTicker.Tick += paintTicker_Tick;
             paintTicker.Interval = 1;
         }
-        Color temp1, temp2;
 
         protected override void OnEnabledChanged(EventArgs e)
         {
-            if (!Enabled)
-            {
-                temp1 = colorOn;
-                temp2 = colorOff;
-                colorOff = colorOn = Color.LightGray;
-            }
-            else
-            {
-                colorOn = temp1;
-                colorOff = temp2;
-            }
             Invalidate();
             base.OnEnabledChanged(e);
         }
@@ -1718,7 +1681,7 @@ namespace AltoControls
             diameter = Width / 2;
             artis = 4 * diameter / 30;
             rect = new RoundedRectangleF(2 * diameter, diameter + 2, diameter / 2, 1, 1);
-            circle = new RectangleF(isOn ? 1 : Width - diameter - 1, 1, diameter, diameter);
+            circle = new RectangleF(!isOn ? 1 : Width - diameter - 1, 1, diameter, diameter);
             base.OnResize(e);
         }
         //creates slide animation
@@ -1727,6 +1690,25 @@ namespace AltoControls
             float x = circle.X;
 
             if (isOn)           //switch the circle to the left
+            {
+                if (x + artis <= Width - diameter - 1)
+                {
+                    x += artis;
+                    circle = new RectangleF(x, 1, diameter, diameter);
+
+                    Invalidate();
+                }
+                else
+                {
+                    x = Width - diameter - 1;
+                    circle = new RectangleF(x, 1, diameter, diameter);
+
+                    Invalidate();
+                    paintTicker.Stop();
+                }
+
+            }
+            else //switch the circle to the left with animation
             {
                 if (x - artis >= 1)
                 {
@@ -1745,25 +1727,6 @@ namespace AltoControls
 
                 }
             }
-            else //switch the circle to the left with animation
-            {
-
-                if (x + artis <= Width - diameter - 1)
-                {
-                    x += artis;
-                    circle = new RectangleF(x, 1, diameter, diameter);
-
-                    Invalidate();
-                }
-                else
-                {
-                    x = Width - diameter - 1;
-                    circle = new RectangleF(x, 1, diameter, diameter);
-
-                    Invalidate();
-                    paintTicker.Stop();
-                }
-            }
         }
 
         protected override Size DefaultSize
@@ -1777,33 +1740,50 @@ namespace AltoControls
         {
             e.Graphics.SmoothingMode = SmoothingMode.HighQuality;
 
-            using (Pen pen = new Pen(borderColor, 2f))
+            if (Enabled)
             {
-                e.Graphics.DrawPath(pen, rect.Path);
+                using (SolidBrush brush = new SolidBrush(isOn ? Color.LightGreen : Color.LightGray))
+                    e.Graphics.FillPath(brush, rect.Path);
+
+                using (Pen pen = new Pen(borderColor, 2f))
+                    e.Graphics.DrawPath(pen, rect.Path);
+
+                string on = "ON";
+                string off = "OFF";
+                if (textEnabled)
+                    using (Font font = new Font("Arial", 8.2f * diameter / 30, FontStyle.Bold))
+                    {
+                        int height = TextRenderer.MeasureText(on, font).Height;
+                        float y = (diameter - height) / 2f;
+                        e.Graphics.DrawString(on, font, Brushes.Gray, 5, y + 1);
+
+                        height = TextRenderer.MeasureText(off, font).Height;
+                        y = (diameter - height) / 2f;
+                        e.Graphics.DrawString(off, font, Brushes.Gray, diameter + 2, y + 1);
+                    }
+
+                using (SolidBrush circleBrush = new SolidBrush("#f6f0e6".FromHex()))
+                    e.Graphics.FillEllipse(circleBrush, circle);
+
+                using (Pen pen = new Pen(Color.LightGray, 1.2f))
+                    e.Graphics.DrawEllipse(pen, circle);
+
             }
-
-            string on = "ON";
-            string off = "OFF";
-            if (textEnabled)
-                using (Font font = new Font("Arial", 9 * diameter / 30, FontStyle.Bold))
+            else
+            {
+                using (SolidBrush disableBrush = new SolidBrush("#CFCFCF".FromHex()))
+                using (SolidBrush ellBrush = new SolidBrush("#B3B3B3".FromHex()))
                 {
-                    int height = TextRenderer.MeasureText(off, font).Height;
-                    float y = (diameter - height) / 2f;
-                    e.Graphics.DrawString(off, font, Brushes.Gray, 3, y + 1);
-
-                    height = TextRenderer.MeasureText(on, font).Height;
-                    y = (diameter - height) / 2f;
-                    e.Graphics.DrawString(on, font, Brushes.Gray, diameter + 2, y + 1);
+                    e.Graphics.FillPath(disableBrush, rect.Path);
+                    e.Graphics.FillEllipse(ellBrush, circle);
+                    e.Graphics.DrawEllipse(Pens.DarkGray, circle);
                 }
-
-
-            using (SolidBrush circleBrush = new SolidBrush(isOn ? colorOn : colorOff))
-                e.Graphics.FillEllipse(circleBrush, circle);
+            }
 
             base.OnPaint(e);
 
         }
-        protected override void OnMouseClick(MouseEventArgs e)
+        protected override void OnMouseDown(MouseEventArgs e)
         {
             if (e.Button != System.Windows.Forms.MouseButtons.Left)
                 return;
@@ -1814,4 +1794,12 @@ namespace AltoControls
         }
     }
     #endregion
+
+    public static class ExtensionMethods
+    {
+        public static Color FromHex(this string hex)
+        {
+            return ColorTranslator.FromHtml(hex);
+        }
+    }
 }
