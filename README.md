@@ -33,7 +33,7 @@
 </ul>
 <h4>Waiter control for long tasks</h4>
 <ul>
-<li>Two different spinning control for last tasks or another jobs</li>
+<li>Two different spinning control for long tasks or similar jobs</li>
 </ul>
 <h3>UPDATE: New AnimatedSwitch Control (SliderControl) added</h3>
 <h4>Animated Switch</h4>
