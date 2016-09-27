@@ -41,10 +41,37 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AltoControls.cs">
+    <Compile Include="Helpers\ExtensionMethods.cs" />
+    <Compile Include="Controls\AltoNumericUpDown.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\AltoProgressBar.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\AltoSlidingLabel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\AltoTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Controls\AltoButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\ProcessingControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\SpinningCircles.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\SwitchButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Helpers\Transparenter.cs" />
+    <Compile Include="Controls\Circular Progress Bar.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Helpers\RoundedRectangleF.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
